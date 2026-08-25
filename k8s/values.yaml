@@ -1,0 +1,50 @@
+# Kubernetes sandbox profile — ifevalcode
+# Generated from the eval's own compose spec in inspect_evals. Image references
+# and the network posture below are what upstream actually declares, not defaults.
+version: 1
+eval: ifevalcode
+readiness: needs-work
+runtimeClass: gvisor
+
+# ── BLOCKERS — resolve before any scored run ──────────────────────────────
+blockers:
+  - >
+    BUILD REQUIRED: at least one service builds from a Dockerfile rather than pulling a publ
+    ished image. It must be built, scanned, pushed to our registry and pinned by digest befo
+    re a scored run.
+
+services:
+  default:
+    build: true
+    # Builds from a Dockerfile — build, scan, push to our registry, pin
+    network_mode: none
+
+egress:
+  default: deny
+  allow: []
+  # Upstream declares network_mode: none for this eval, so an empty allowlist
+  # is the CORRECT configuration, not an unfinished one. Do not add hosts
+  # without evidence that the task genuinely needs them.
+  enforce_sni: true
+  tcp_only: true
+
+# WARNING: never set allowDomains to ["*"]. The upstream chart's
+# `{{- if has "*" .Values.allowDomains }}` branch drops toPorts entirely — no SNI,
+# no Host regex, all ports and protocols — and degenerates DNS to matchPattern "*".
+# A wildcard silently disables the entire outer egress ring.
+
+# Models are NEVER called from the sandbox — Inspect's runner makes model calls.
+# The TrustedRouter gateway must not appear in any allowlist above.
+
+resources:
+  requests: { cpu: "1", memory: "4Gi", ephemeral-storage: "8Gi" }
+  limits:   { cpu: "1", memory: "4Gi", ephemeral-storage: "8Gi" }   # Guaranteed QoS
+
+security:
+  automountServiceAccountToken: false
+  serviceAccountCreate: false
+  seccompProfile: RuntimeDefault
+
+# gVisor changes behaviour: it blocks raw packet creation, prevents chroot escapes
+# and breaks sshpass. A model scoring zero because a syscall was blocked is a wrong
+# published result, not a model failure. Classify and record at onboarding.
