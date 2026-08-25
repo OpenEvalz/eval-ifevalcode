@@ -1,0 +1,47 @@
+{
+  "openevalz_version": 1,
+  "eval": {
+    "id": "ifevalcode",
+    "slug": "ifevalcode",
+    "title": "IFEvalCode: Controlled Code Generation",
+    "group": "Coding",
+    "tags": [],
+    "source": "core"
+  },
+  "upstream": {
+    "repo": "https://github.com/UKGovernmentBEIS/inspect_evals",
+    "path": "src/inspect_evals/ifevalcode",
+    "inspect_ai": "0.3.260",
+    "eval_version": "2-A",
+    "dependency": "ifevalcode"
+  },
+  "execution": {
+    "class": "sandbox-local",
+    "cost_class": "high",
+    "sandbox": [
+      "scorer"
+    ],
+    "requires_internet": false,
+    "fast": false,
+    "supports_k8s": false,
+    "environment": ""
+  },
+  "tasks": [
+    {
+      "name": "ifevalcode",
+      "samples": 810
+    }
+  ],
+  "total_samples": 810,
+  "external_assets": [
+    {
+      "type": "huggingface",
+      "source": "Multilingual-Multimodal-NLP/IfEvalCode-testset",
+      "state": "pinned"
+    }
+  ],
+  "scaffolds": [
+    "baseline"
+  ],
+  "generated": "2026-08-25"
+}
